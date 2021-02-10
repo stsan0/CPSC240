@@ -1,0 +1,229 @@
+     1                                  ;****************************************************************************************************************************
+     2                                  ;Program name: "Area of Rectangle".  This program computes total perimeter and average length of side given the width       *
+     3                                  ;and height of the rectangle.                                                                                               *
+     4                                  ;This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License  *
+     5                                  ;version 3 as published by the Free Software Foundation.                                                                    *
+     6                                  ;This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied         *
+     7                                  ;warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.     *
+     8                                  ;A copy of the GNU General Public License v3 is available here:  <https://www.gnu.org/licenses/>.                           *
+     9                                  ;****************************************************************************************************************************
+    10                                  ;Author information
+    11                                  ; Author name: Steven Tsan
+    12                                  ; Author email: stsan@csu.fullerton.edu
+    13                                  ;
+    14                                  ;Program information
+    15                                  ; Program name: Area of Rectangle
+    16                                  ; Programming Languages: One module in C++ and one in X86
+    17                                  ; Date program began: 2021-February-07
+    18                                  ; Date of last update: 2021-February-13
+    19                                  ;
+    20                                  ;Purpose
+    21                                  ; Given the width and height of the rectangle compute the total perimeter and the average length of side.
+    22                                  ;
+    23                                  ;Project information
+    24                                  ; Project files: rectangle.cpp perimeter.asm run.sh
+    25                                  ; Status: Finished.
+    26                                  ;
+    27                                  ;
+    28                                  ;Translator information
+    29                                  ;  Linux: nasm -f elf64 -l perimeter.lis -o perimeter.o perimeter.asm
+    30                                  ;
+    31                                  ;========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1=========2=========3=========4=========5=========6=========7**
+    32                                  extern printf
+    33                                  extern scanf
+    34                                  
+    35                                  global compute_x86
+    36                                  
+    37                                  segment .data:
+    38                                  
+    39 00000000 546869732070726F67-     welcome db "This program will compute the perimeter and the average side length of a rectangle.", 10, 0
+    39 00000009 72616D2077696C6C20-
+    39 00000012 636F6D707574652074-
+    39 0000001B 686520706572696D65-
+    39 00000024 74657220616E642074-
+    39 0000002D 686520617665726167-
+    39 00000036 652073696465206C65-
+    39 0000003F 6E677468206F662061-
+    39 00000048 2072656374616E676C-
+    39 00000051 652E0A00           
+    40 00000055 257300                  stringformat db "%s", 0
+    41 00000058 256C6600                floatformat db "%lf", 0
+    42 0000005C 456E74657220746865-     input1prompt db "Enter the height: ", 0
+    42 00000065 206865696768743A20-
+    42 0000006E 00                 
+    43 0000006F 456E74657220746865-     input2prompt db "Enter the width:  ", 0
+    43 00000078 2077696474683A2020-
+    43 00000081 00                 
+    44                                  ; Perimeter is heightx2 + widthx2. first multiply height and width, then add width to height
+    45 00000082 54686520706572696D-     output_perimeter db "The perimeter is %5.1lf",10,0
+    45 0000008B 657465722069732025-
+    45 00000094 352E316C660A00     
+    46                                  ; average length of rectangle = perimeter/4
+    47 0000009B 546865206C656E6774-     output_length db "The length of the average side is %5.3lf.",10,0
+    47 000000A4 68206F662074686520-
+    47 000000AD 617665726167652073-
+    47 000000B6 696465206973202535-
+    47 000000BF 2E336C662E0A00     
+    48 000000C6 4920686F706520796F-     love db "I hope you enjoyed your rectangle.",10,0
+    48 000000CF 7520656E6A6F796564-
+    48 000000D8 20796F757220726563-
+    48 000000E1 74616E676C652E0A00 
+    49 000000EA 54686520617373656D-     good_bye db "The assembly program will send the perimeter to the main function.",10,0
+    49 000000F3 626C792070726F6772-
+    49 000000FC 616D2077696C6C2073-
+    49 00000105 656E64207468652070-
+    49 0000010E 6572696D6574657220-
+    49 00000117 746F20746865206D61-
+    49 00000120 696E2066756E637469-
+    49 00000129 6F6E2E0A00         
+    50                                  
+    51                                  segment .bss
+    52                                  
+    53                                  segment .text
+    54                                  
+    55                                  ; entry point
+    56                                  compute_x86:
+    57                                  
+    58                                  ;===== Perform standard update of the point into the system stack
+    59 00000000 55                      push rbp
+    60 00000001 4889E5                  mov rbp, rsp
+    61                                  
+    62                                  ;=====  extra backups.  Some of these are unnecessary but we do them anyway
+    63 00000004 53                      push rbx
+    64 00000005 51                      push rcx
+    65 00000006 52                      push rdx
+    66 00000007 57                      push rdi
+    67 00000008 56                      push rsi
+    68 00000009 4150                    push r8
+    69 0000000B 4151                    push r9
+    70 0000000D 4152                    push r10
+    71 0000000F 4153                    push r11
+    72 00000011 4154                    push r12
+    73 00000013 4155                    push r13
+    74 00000015 4156                    push r14
+    75 00000017 4157                    push r15
+    76 00000019 9C                      pushf
+    77 0000001A 6A00                    push qword 0
+    78                                  
+    79                                  ;welcome message
+    80 0000001C 48BF-                   mov  qword rdi, stringformat
+    80 0000001E [5500000000000000] 
+    81 00000026 48BE-                   mov  qword rsi, welcome
+    81 00000028 [0000000000000000] 
+    82 00000030 B800000000              mov qword rax, 0
+    83 00000035 E8(00000000)            call printf
+    84                                  
+    85                                  ; float number 1, height prompting
+    86 0000003A 48BF-                   mov qword rdi, stringformat
+    86 0000003C [5500000000000000] 
+    87 00000044 48BE-                   mov qword rsi, input1prompt
+    87 00000046 [5C00000000000000] 
+    88 0000004E B800000000              mov qword rax, 0
+    89 00000053 E8(00000000)            call printf
+    90                                  
+    91                                  
+    92                                  ; insertion for height
+    93 00000058 B801000000              mov rax, 1
+    94 0000005D 48BF-                   mov rdi, floatformat
+    94 0000005F [5800000000000000] 
+    95 00000067 6A00                    push qword 0
+    96 00000069 4889E6                  mov rsi, rsp
+    97 0000006C E8(00000000)            call scanf
+    98 00000071 F2440F101424            movsd xmm10, [rsp]
+    99 00000077 58                      pop rax
+   100                                  
+   101                                  ; float number 1, width prompting
+   102 00000078 48BF-                   mov qword rdi, stringformat
+   102 0000007A [5500000000000000] 
+   103 00000082 48BE-                   mov qword rsi, input2prompt
+   103 00000084 [6F00000000000000] 
+   104 0000008C B800000000              mov qword rax, 0
+   105 00000091 E8(00000000)            call printf
+   106                                  
+   107                                  
+   108                                  ; insertion for width
+   109 00000096 B801000000              mov rax, 1
+   110 0000009B 48BF-                   mov rdi, floatformat
+   110 0000009D [5800000000000000] 
+   111 000000A5 6A00                    push qword 0
+   112 000000A7 4889E6                  mov rsi, rsp
+   113 000000AA E8(00000000)            call scanf
+   114 000000AF F2440F101C24            movsd xmm11, [rsp]
+   115 000000B5 58                      pop rax
+   116                                  
+   117                                  ;===== compute for perimeter.
+   118                                  
+   119                                  ; Perimeter is height*2 + width*2.
+   120                                  ;first multiply height and width individually, then add width to height
+   121 000000B6 F2450F10E2              movsd xmm12, xmm10  ; height
+   122 000000BB F2450F58E2              addsd xmm12, xmm10 ; height + height = height*2
+   123 000000C0 F2450F58E3              addsd xmm12, xmm11 ; width + width = width*2
+   124 000000C5 F2450F58E3              addsd xmm12, xmm11 ; xmm12 is now perimeter
+   125                                  
+   126                                  ; print perimeter
+   127 000000CA 6A00                    push qword 0
+   128 000000CC B801000000              mov rax, 1
+   129 000000D1 48BF-                   mov rdi, output_perimeter
+   129 000000D3 [8200000000000000] 
+   130 000000DB F2410F10C4              movsd xmm0, xmm12
+   131 000000E0 E8(00000000)            call printf
+   132 000000E5 58                      pop rax
+   133                                  
+   134                                  ; compute for average length
+   135                                  ; average length of rectangle = perimeter/4
+   136 000000E6 41B804000000            mov r8, 4
+   137 000000EC F2450F10EC              movsd xmm13, xmm12
+   138 000000F1 F24D0F2AF0              cvtsi2sd xmm14, r8
+   139 000000F6 F2450F5EEE              divsd xmm13, xmm14 ; xmm13 is now average length
+   140                                  
+   141                                  ;===== print out results and goodbye
+   142                                  ; print average length
+   143 000000FB 6A00                    push qword 0
+   144 000000FD B801000000              mov rax, 1
+   145 00000102 48BF-                   mov rdi, output_length
+   145 00000104 [9B00000000000000] 
+   146 0000010C F2410F10C5              movsd xmm0, xmm13
+   147 00000111 E8(00000000)            call printf
+   148 00000116 58                      pop rax
+   149                                  
+   150                                  ;print love
+   151 00000117 6A00                    push qword 0
+   152 00000119 48BF-                   mov qword rdi, stringformat
+   152 0000011B [5500000000000000] 
+   153 00000123 48BE-                   mov qword rsi, love
+   153 00000125 [C600000000000000] 
+   154 0000012D E8(00000000)            call printf
+   155 00000132 58                      pop rax
+   156                                  
+   157                                  ; print goodbye
+   158 00000133 6A00                    push qword 0
+   159 00000135 48BF-                   mov qword rdi, stringformat
+   159 00000137 [5500000000000000] 
+   160 0000013F 48BE-                   mov qword rsi, good_bye
+   160 00000141 [EA00000000000000] 
+   161 00000149 E8(00000000)            call printf
+   162 0000014E 58                      pop rax
+   163                                  
+   164                                  
+   165                                  
+   166                                  ;===== Restore original values to integer registers
+   167 0000014F 58                      pop rax
+   168 00000150 9D                      popf                                                        ;Restore rflags
+   169 00000151 5B                      pop rbx                                                     ;Restore rbx
+   170 00000152 415F                    pop r15                                                     ;Restore r15
+   171 00000154 415E                    pop r14                                                     ;Restore r14
+   172 00000156 415D                    pop r13                                                     ;Restore r13
+   173 00000158 415C                    pop r12                                                     ;Restore r12
+   174 0000015A 415B                    pop r11                                                     ;Restore r11
+   175 0000015C 415A                    pop r10                                                     ;Restore r10
+   176 0000015E 4159                    pop r9                                                      ;Restore r9
+   177 00000160 4158                    pop r8                                                      ;Restore r8
+   178 00000162 59                      pop rcx                                                     ;Restore rcx
+   179 00000163 5A                      pop rdx                                                     ;Restore rdx
+   180 00000164 5E                      pop rsi                                                     ;Restore rsi
+   181 00000165 5F                      pop rdi                                                     ;Restore rdi
+   182 00000166 5D                      pop rbp                                                     ;Restore rbp
+   183                                  
+   184 00000167 F2410F10C4              movsd xmm0, xmm12
+   185 0000016C C3                      ret
+   186                                  ;End
