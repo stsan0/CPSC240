@@ -1,18 +1,26 @@
 #!/bin/bash
 
-#Program: CPSC 240-5 Test 1
+#Program: Quadratic 2
 #author: S. Tsan
-
 rm *.o
 rm *.out
-echo "Compile C++ file electricity.cpp"
-g++ -c -m64 -Wall -no-pie -o elect.o electricity.cpp -std=c++17
+echo "compile second degree"
+g++ -c -m64 -Wall -no-pie -o second_degree.o Second_degree.c -std=c++17
 
-echo "Assemble X86 file from resistance.asm"
-nasm -f elf64 -l resistance.lis -o resistance.o resistance.asm
+echo "assemble quadratic"
+nasm -f elf64 -l quadratic.lis -o quadratic.o Quadratic.asm
 
-echo "Link the object files"
-g++ -m64 -no-pie -o calculator.out -std=c++17 elect.o resistance.o
+echo "compile isfloat"
+g++ -c -m64 -no-pie -Wall -o isfloat.o isfloat.cpp -std=c++17
 
-echo "Execute the program Test 1"
-./calculator.out
+echo "compile quadlibrary"
+g++ -c -m64 -Wall -no-pie -o quadlibrary.o Quadlibrary.cpp -std=c++17
+
+echo "link object files"
+g++ -m64 -no-pie -o quad.out -std=c++17 second_degree.o quadratic.o isfloat.o quadlibrary.o
+
+echo "execute"
+./quad.out
+
+rm *.o
+rm *.lis
