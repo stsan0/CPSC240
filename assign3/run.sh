@@ -7,6 +7,10 @@ rm *.out
 echo "compile main"
 g++ -c -m64 -Wall -no-pie -o main.o main.c -std=c++17
 
+
+echo "compile validation"
+g++ -c -m64 -Wall -fno-pie -no-pie -o digits.o isfloat.cpp -std=c++17
+
 echo "assemble control"
 nasm -f elf64 -l control.lis -o control.o control.asm
 
@@ -19,8 +23,10 @@ nasm -f elf64 -l sum.lis -o sum.o sum.asm
 echo "compile display"
 g++ -c -m64 -Wall -no-pie -o display.o display.cpp -std=c++17
 
+
+
 echo "link object files"
-g++ -m64 -no-pie -o arraysum.out -std=c++17 main.o control.o fill.o sum.o display.o
+g++ -g -F dwarf -m64 -no-pie -o arraysum.out -std=c++17 main.o control.o fill.o sum.o display.o digits.o
 
 echo "execute the program"
 ./arraysum.out
